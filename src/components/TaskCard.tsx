@@ -11,27 +11,27 @@ interface TaskCardProps {
 const priorityConfig = {
   low: {
     icon: Circle,
-    color: "text-neon-cyan",
-    glow: "neon-glow-blue",
-    border: "border-neon-cyan/30",
+    color: "text-neon-lime",
+    glow: "neon-glow-lime",
+    border: "border-neon-lime/30",
   },
   medium: {
     icon: Clock,
-    color: "text-neon-purple",
-    glow: "neon-glow-purple",
-    border: "border-neon-purple/30",
+    color: "text-neon-yellow",
+    glow: "neon-glow-yellow",
+    border: "border-neon-yellow/30",
   },
   high: {
     icon: Flame,
-    color: "text-primary",
-    glow: "neon-glow-blue",
-    border: "border-primary/30",
+    color: "text-neon-red",
+    glow: "neon-glow-red",
+    border: "border-neon-red/30",
   },
   critical: {
     icon: AlertTriangle,
-    color: "text-neon-pink",
-    glow: "neon-glow-pink pulse-glow",
-    border: "border-neon-pink/30",
+    color: "text-neon-red",
+    glow: "neon-glow-red pulse-glow",
+    border: "border-neon-red/30",
   },
 };
 

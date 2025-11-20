@@ -48,12 +48,18 @@ All colors MUST be HSL.
     --neon-cyan: 180 100% 50%;
     --neon-pink: 340 100% 52%;
     --neon-green: 120 100% 50%;
+    --neon-red: 0 100% 50%;
+    --neon-yellow: 45 100% 50%;
+    --neon-lime: 75 100% 50%;
 
     /* Glowing effects */
     --glow-blue: 0 0 20px hsl(190 100% 50% / 0.5);
     --glow-purple: 0 0 20px hsl(270 85% 55% / 0.5);
     --glow-pink: 0 0 20px hsl(340 100% 52% / 0.5);
     --glow-green: 0 0 20px hsl(120 100% 50% / 0.5);
+    --glow-red: 0 0 20px hsl(0 100% 50% / 0.5);
+    --glow-yellow: 0 0 20px hsl(45 100% 50% / 0.5);
+    --glow-lime: 0 0 20px hsl(75 100% 50% / 0.5);
 
     /* Gradients */
     --gradient-neon: linear-gradient(135deg, hsl(190 100% 50%), hsl(270 85% 55%));
@@ -103,6 +109,24 @@ All colors MUST be HSL.
     box-shadow: 0 0 20px hsl(120 100% 50% / 0.3),
                 0 0 40px hsl(120 100% 50% / 0.15),
                 inset 0 0 10px hsl(120 100% 50% / 0.1);
+  }
+
+  .neon-glow-red {
+    box-shadow: 0 0 20px hsl(0 100% 50% / 0.3),
+                0 0 40px hsl(0 100% 50% / 0.15),
+                inset 0 0 10px hsl(0 100% 50% / 0.1);
+  }
+
+  .neon-glow-yellow {
+    box-shadow: 0 0 20px hsl(45 100% 50% / 0.3),
+                0 0 40px hsl(45 100% 50% / 0.15),
+                inset 0 0 10px hsl(45 100% 50% / 0.1);
+  }
+
+  .neon-glow-lime {
+    box-shadow: 0 0 20px hsl(75 100% 50% / 0.3),
+                0 0 40px hsl(75 100% 50% / 0.15),
+                inset 0 0 10px hsl(75 100% 50% / 0.1);
   }
 
   /* Glassmorphism */
