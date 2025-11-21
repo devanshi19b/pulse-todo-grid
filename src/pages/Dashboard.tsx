@@ -1,18 +1,30 @@
 import { useState, useEffect } from "react";
-import { Plus, CheckCircle2, Clock, AlertTriangle, Zap } from "lucide-react";
+import { Plus, CheckCircle2, Clock, AlertTriangle, Zap, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StatsCard from "@/components/StatsCard";
 import TaskCard from "@/components/TaskCard";
 import TaskModal from "@/components/TaskModal";
-import { Task, Priority } from "@/types/task";
+import { Task, Priority, WorkType } from "@/types/task";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+
+const motivationalMessages = [
+  "Every task completed is a step closer to your goals! 💪",
+  "Your productivity today shapes your success tomorrow! ⚡",
+  "Small progress is still progress. Keep going! 🌟",
+  "You're doing amazing! One task at a time! 🚀",
+  "Focus on progress, not perfection! ✨",
+  "Believe in yourself and crush those tasks! 🎯",
+  "You've got this! Make today count! 🔥",
+];
 
 const Dashboard = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [greeting, setGreeting] = useState("");
+  const [userName, setUserName] = useState("");
+  const [motivationalMessage, setMotivationalMessage] = useState("");
   const { user } = useAuth();
 
   useEffect(() => {
@@ -21,8 +33,31 @@ const Dashboard = () => {
     else if (hour < 18) setGreeting("Good Afternoon");
     else setGreeting("Good Evening");
 
+    // Set random motivational message
+    const randomMessage = motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)];
+    setMotivationalMessage(randomMessage);
+
+    loadUserProfile();
     loadTasks();
   }, [user]);
+
+  const loadUserProfile = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("id", user.id)
+      .single();
+
+    if (error) {
+      console.error("Error loading profile:", error);
+      setUserName(user.email?.split("@")[0] || "User");
+      return;
+    }
+
+    setUserName(data?.username || user.email?.split("@")[0] || "User");
+  };
 
   const loadTasks = async () => {
     if (!user) return;
@@ -49,6 +84,7 @@ const Dashboard = () => {
       completedAt: task.completed_at ? new Date(task.completed_at) : undefined,
       category: task.category || undefined,
       tags: task.tags || undefined,
+      workType: (task.work_type as WorkType) || undefined,
     }));
 
     setTasks(formattedTasks);
@@ -100,9 +136,21 @@ const Dashboard = () => {
     description: string;
     priority: Priority;
     dueDate: string;
+    dueTime: string;
     category: string;
+    workType: WorkType;
   }) => {
     if (!user) return;
+
+    // Combine date and time if both provided
+    let dueDateTimeString = null;
+    if (taskData.dueDate) {
+      if (taskData.dueTime) {
+        dueDateTimeString = `${taskData.dueDate}T${taskData.dueTime}:00`;
+      } else {
+        dueDateTimeString = `${taskData.dueDate}T00:00:00`;
+      }
+    }
 
     const { data, error } = await supabase
       .from("tasks")
@@ -112,8 +160,9 @@ const Dashboard = () => {
         description: taskData.description,
         priority: taskData.priority,
         status: "pending",
-        due_date: taskData.dueDate || null,
+        due_date: dueDateTimeString,
         category: taskData.category || null,
+        work_type: taskData.workType,
       })
       .select()
       .single();
@@ -132,6 +181,7 @@ const Dashboard = () => {
       dueDate: data.due_date ? new Date(data.due_date) : undefined,
       createdAt: new Date(data.created_at),
       category: data.category || undefined,
+      workType: data.work_type as WorkType,
     };
 
     setTasks((prev) => [newTask, ...prev]);
@@ -144,12 +194,18 @@ const Dashboard = () => {
     <div className="min-h-screen pb-20 md:pb-8 md:pl-20">
       <div className="max-w-7xl mx-auto p-6 space-y-8">
         {/* Header */}
-        <div className="gradient-animate rounded-3xl p-8 mb-8 animate-fade-in">
-          <h1 className="text-4xl md:text-5xl font-bold mb-2 animate-glow-pulse">
-            {greeting}! 👋
+        <div className="gradient-animate rounded-3xl p-8 mb-8 animate-fade-in relative overflow-hidden">
+          <div className="absolute top-4 right-4 animate-glow-pulse">
+            <Sparkles className="w-8 h-8 text-primary" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-2">
+            {greeting}, {userName}! 👋
           </h1>
-          <p className="text-lg text-muted-foreground">
-            Here's what's on your plate today
+          <p className="text-lg text-muted-foreground mb-2">
+            Here&apos;s what&apos;s on your plate today
+          </p>
+          <p className="text-base text-primary font-medium italic mt-4">
+            {motivationalMessage}
           </p>
         </div>
 

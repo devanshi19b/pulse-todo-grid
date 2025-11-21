@@ -1,4 +1,4 @@
-import { CheckCircle2, Circle, Clock, Flame, AlertTriangle, Zap } from "lucide-react";
+import { CheckCircle2, Circle, Clock, Flame, AlertTriangle, Zap, Briefcase, User } from "lucide-react";
 import { Task, Priority } from "@/types/task";
 import { cn } from "@/lib/utils";
 
@@ -120,6 +120,22 @@ const TaskCard = ({ task, onToggle, onClick }: TaskCardProps) => {
                   {tag}
                 </span>
               ))}
+            </div>
+          )}
+
+          {task.workType && (
+            <div className="flex items-center gap-2 mt-3">
+              {task.workType === "professional" ? (
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/20 neon-glow-blue">
+                  <Briefcase className="w-3 h-3 text-primary" />
+                  <span className="text-xs font-medium text-primary">Professional</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-neon-purple/20 neon-glow-purple">
+                  <User className="w-3 h-3 text-neon-purple" />
+                  <span className="text-xs font-medium text-neon-purple">Personal</span>
+                </div>
+              )}
             </div>
           )}
         </div>

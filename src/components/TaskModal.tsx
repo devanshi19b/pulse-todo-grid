@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { X, Calendar, Tag, Flag } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Calendar, Tag, Flag, Clock, Briefcase, User } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Priority } from "@/types/task";
+import { Priority, WorkType } from "@/types/task";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface TaskModalProps {
   open: boolean;
@@ -15,7 +16,9 @@ interface TaskModalProps {
     description: string;
     priority: Priority;
     dueDate: string;
+    dueTime: string;
     category: string;
+    workType: WorkType;
   }) => void;
 }
 
@@ -24,11 +27,13 @@ const TaskModal = ({ open, onClose, onSave }: TaskModalProps) => {
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<Priority>("medium");
   const [dueDate, setDueDate] = useState("");
+  const [dueTime, setDueTime] = useState("");
   const [category, setCategory] = useState("");
+  const [workType, setWorkType] = useState<WorkType>("personal");
 
   const handleSave = () => {
     if (!title.trim()) return;
-    onSave({ title, description, priority, dueDate, category });
+    onSave({ title, description, priority, dueDate, dueTime, category, workType });
     handleClose();
   };
 
@@ -37,7 +42,9 @@ const TaskModal = ({ open, onClose, onSave }: TaskModalProps) => {
     setDescription("");
     setPriority("medium");
     setDueDate("");
+    setDueTime("");
     setCategory("");
+    setWorkType("personal");
     onClose();
   };
 
@@ -74,7 +81,27 @@ const TaskModal = ({ open, onClose, onSave }: TaskModalProps) => {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Work Type Selector */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground flex items-center gap-2">
+              <Briefcase className="w-4 h-4" />
+              Work Type
+            </label>
+            <Tabs value={workType} onValueChange={(value) => setWorkType(value as WorkType)} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 glass-card">
+                <TabsTrigger value="personal" className="data-[state=active]:neon-glow-purple">
+                  <User className="w-4 h-4 mr-2" />
+                  Personal
+                </TabsTrigger>
+                <TabsTrigger value="professional" className="data-[state=active]:neon-glow-blue">
+                  <Briefcase className="w-4 h-4 mr-2" />
+                  Professional
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground flex items-center gap-2">
                 <Flag className="w-4 h-4" />
@@ -95,11 +122,26 @@ const TaskModal = ({ open, onClose, onSave }: TaskModalProps) => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                <Tag className="w-4 h-4" />
+                Category
+              </label>
+              <Input
+                placeholder="e.g., Work, Personal"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="glass-card border-primary/30"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 Due Date
               </label>
               <Input
-                type="datetime-local"
+                type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
                 className="glass-card border-primary/30"
@@ -108,13 +150,13 @@ const TaskModal = ({ open, onClose, onSave }: TaskModalProps) => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                <Tag className="w-4 h-4" />
-                Category
+                <Clock className="w-4 h-4" />
+                Due Time
               </label>
               <Input
-                placeholder="e.g., Work, Personal"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                type="time"
+                value={dueTime}
+                onChange={(e) => setDueTime(e.target.value)}
                 className="glass-card border-primary/30"
               />
             </div>

@@ -1,5 +1,6 @@
 export type Priority = "low" | "medium" | "high" | "critical";
 export type TaskStatus = "pending" | "completed" | "overdue";
+export type WorkType = "personal" | "professional";
 
 export interface Task {
   id: string;
@@ -12,4 +13,5 @@ export interface Task {
   completedAt?: Date;
   category?: string;
   tags?: string[];
+  workType?: WorkType;
 }
