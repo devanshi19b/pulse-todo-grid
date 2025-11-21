@@ -6,11 +6,14 @@ import TaskCard from "@/components/TaskCard";
 import TaskModal from "@/components/TaskModal";
 import { Task, Priority } from "@/types/task";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Dashboard = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [greeting, setGreeting] = useState("");
+  const { user } = useAuth();
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -18,42 +21,38 @@ const Dashboard = () => {
     else if (hour < 18) setGreeting("Good Afternoon");
     else setGreeting("Good Evening");
 
-    // Load sample tasks
-    const sampleTasks: Task[] = [
-      {
-        id: "1",
-        title: "Complete project proposal",
-        description: "Finalize the Q4 project proposal and send to stakeholders",
-        priority: "high",
-        status: "pending",
-        dueDate: new Date(Date.now() + 86400000),
-        createdAt: new Date(),
-        category: "Work",
-        tags: ["urgent", "deadline"],
-      },
-      {
-        id: "2",
-        title: "Team meeting preparation",
-        description: "Prepare slides for tomorrow's team standup",
-        priority: "medium",
-        status: "pending",
-        dueDate: new Date(Date.now() + 3600000),
-        createdAt: new Date(),
-        category: "Work",
-      },
-      {
-        id: "3",
-        title: "Review code PRs",
-        description: "Review and merge pending pull requests",
-        priority: "low",
-        status: "completed",
-        createdAt: new Date(),
-        completedAt: new Date(),
-        category: "Development",
-      },
-    ];
-    setTasks(sampleTasks);
-  }, []);
+    loadTasks();
+  }, [user]);
+
+  const loadTasks = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("tasks")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(10);
+
+    if (error) {
+      toast.error("Failed to load tasks");
+      return;
+    }
+
+    const formattedTasks: Task[] = data.map((task) => ({
+      id: task.id,
+      title: task.title,
+      description: task.description || undefined,
+      priority: task.priority as Priority,
+      status: task.status as "pending" | "completed" | "overdue",
+      dueDate: task.due_date ? new Date(task.due_date) : undefined,
+      createdAt: new Date(task.created_at),
+      completedAt: task.completed_at ? new Date(task.completed_at) : undefined,
+      category: task.category || undefined,
+      tags: task.tags || undefined,
+    }));
+
+    setTasks(formattedTasks);
+  };
 
   const stats = {
     pending: tasks.filter((t) => t.status === "pending").length,
@@ -62,38 +61,79 @@ const Dashboard = () => {
     upcoming: tasks.filter((t) => t.dueDate && new Date(t.dueDate) > new Date()).length,
   };
 
-  const handleToggleTask = (id: string) => {
+  const handleToggleTask = async (id: string) => {
+    const task = tasks.find((t) => t.id === id);
+    if (!task) return;
+
+    const newStatus = task.status === "completed" ? "pending" : "completed";
+    const completedAt = newStatus === "completed" ? new Date().toISOString() : null;
+
+    const { error } = await supabase
+      .from("tasks")
+      .update({
+        status: newStatus,
+        completed_at: completedAt,
+      })
+      .eq("id", id);
+
+    if (error) {
+      toast.error("Failed to update task");
+      return;
+    }
+
     setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id
+      prev.map((t) =>
+        t.id === id
           ? {
-              ...task,
-              status: task.status === "completed" ? "pending" : "completed",
-              completedAt: task.status === "completed" ? undefined : new Date(),
+              ...t,
+              status: newStatus as "pending" | "completed",
+              completedAt: completedAt ? new Date(completedAt) : undefined,
             }
-          : task
+          : t
       )
     );
     toast.success("Task updated!");
   };
 
-  const handleCreateTask = (taskData: {
+  const handleCreateTask = async (taskData: {
     title: string;
     description: string;
     priority: Priority;
     dueDate: string;
     category: string;
   }) => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("tasks")
+      .insert({
+        user_id: user.id,
+        title: taskData.title,
+        description: taskData.description,
+        priority: taskData.priority,
+        status: "pending",
+        due_date: taskData.dueDate || null,
+        category: taskData.category || null,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      toast.error("Failed to create task");
+      return;
+    }
+
     const newTask: Task = {
-      id: Date.now().toString(),
-      title: taskData.title,
-      description: taskData.description,
-      priority: taskData.priority,
-      status: "pending",
-      dueDate: taskData.dueDate ? new Date(taskData.dueDate) : undefined,
-      createdAt: new Date(),
-      category: taskData.category,
+      id: data.id,
+      title: data.title,
+      description: data.description || undefined,
+      priority: data.priority as Priority,
+      status: data.status as "pending",
+      dueDate: data.due_date ? new Date(data.due_date) : undefined,
+      createdAt: new Date(data.created_at),
+      category: data.category || undefined,
     };
+
     setTasks((prev) => [newTask, ...prev]);
     toast.success("Task created successfully!");
   };

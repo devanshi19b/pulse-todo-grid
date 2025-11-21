@@ -1,7 +1,10 @@
-import { LayoutDashboard, ListTodo, Calendar, Settings } from "lucide-react";
+import { LayoutDashboard, ListTodo, Calendar, Settings, LogOut } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
 
 const Navigation = () => {
+  const { signOut } = useAuth();
   const navItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/" },
     { icon: ListTodo, label: "Tasks", path: "/tasks" },
@@ -26,6 +29,16 @@ const Navigation = () => {
               </span>
             </NavLink>
           ))}
+          <Button
+            onClick={signOut}
+            variant="ghost"
+            className="flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-300 hover:bg-destructive/10 group md:mt-auto"
+          >
+            <LogOut className="w-6 h-6 text-muted-foreground group-hover:text-destructive transition-colors" />
+            <span className="text-xs text-muted-foreground group-hover:text-destructive transition-colors hidden md:block">
+              Logout
+            </span>
+          </Button>
         </div>
       </div>
     </nav>

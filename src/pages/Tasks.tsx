@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Filter, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -7,74 +7,110 @@ import TaskCard from "@/components/TaskCard";
 import TaskModal from "@/components/TaskModal";
 import { Task, Priority } from "@/types/task";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Tasks = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTab, setFilterTab] = useState("all");
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const { user } = useAuth();
 
-  // Sample tasks
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: "1",
-      title: "Complete project proposal",
-      description: "Finalize the Q4 project proposal",
-      priority: "high",
-      status: "pending",
-      dueDate: new Date(Date.now() + 86400000),
-      createdAt: new Date(),
-      tags: ["urgent", "work"],
-    },
-    {
-      id: "2",
-      title: "Update documentation",
-      priority: "medium",
-      status: "pending",
-      createdAt: new Date(),
-    },
-    {
-      id: "3",
-      title: "Code review",
-      priority: "low",
-      status: "completed",
-      createdAt: new Date(),
-      completedAt: new Date(),
-    },
-  ]);
+  useEffect(() => {
+    loadTasks();
+  }, [user, filterTab]);
 
-  const handleToggleTask = (id: string) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id
-          ? {
-              ...task,
-              status: task.status === "completed" ? "pending" : "completed",
-              completedAt: task.status === "completed" ? undefined : new Date(),
-            }
-          : task
-      )
-    );
+  const loadTasks = async () => {
+    if (!user) return;
+
+    let query = supabase
+      .from("tasks")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (filterTab === "pending") {
+      query = query.eq("status", "pending");
+    } else if (filterTab === "completed") {
+      query = query.eq("status", "completed");
+    } else if (filterTab === "overdue") {
+      query = query.eq("status", "overdue");
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      toast.error("Failed to load tasks");
+      return;
+    }
+
+    const formattedTasks: Task[] = data.map((task) => ({
+      id: task.id,
+      title: task.title,
+      description: task.description || undefined,
+      priority: task.priority as Priority,
+      status: task.status as "pending" | "completed" | "overdue",
+      dueDate: task.due_date ? new Date(task.due_date) : undefined,
+      createdAt: new Date(task.created_at),
+      completedAt: task.completed_at ? new Date(task.completed_at) : undefined,
+      category: task.category || undefined,
+      tags: task.tags || undefined,
+    }));
+
+    setTasks(formattedTasks);
+  };
+
+  const handleToggleTask = async (id: string) => {
+    const task = tasks.find((t) => t.id === id);
+    if (!task) return;
+
+    const newStatus = task.status === "completed" ? "pending" : "completed";
+    const completedAt = newStatus === "completed" ? new Date().toISOString() : null;
+
+    const { error } = await supabase
+      .from("tasks")
+      .update({
+        status: newStatus,
+        completed_at: completedAt,
+      })
+      .eq("id", id);
+
+    if (error) {
+      toast.error("Failed to update task");
+      return;
+    }
+
+    loadTasks();
     toast.success("Task updated!");
   };
 
-  const handleCreateTask = (taskData: {
+  const handleCreateTask = async (taskData: {
     title: string;
     description: string;
     priority: Priority;
     dueDate: string;
     category: string;
   }) => {
-    const newTask: Task = {
-      id: Date.now().toString(),
-      title: taskData.title,
-      description: taskData.description,
-      priority: taskData.priority,
-      status: "pending",
-      dueDate: taskData.dueDate ? new Date(taskData.dueDate) : undefined,
-      createdAt: new Date(),
-      category: taskData.category,
-    };
-    setTasks((prev) => [newTask, ...prev]);
+    if (!user) return;
+
+    const { error } = await supabase
+      .from("tasks")
+      .insert({
+        user_id: user.id,
+        title: taskData.title,
+        description: taskData.description,
+        priority: taskData.priority,
+        status: "pending",
+        due_date: taskData.dueDate || null,
+        category: taskData.category || null,
+      });
+
+    if (error) {
+      toast.error("Failed to create task");
+      return;
+    }
+
+    loadTasks();
     toast.success("Task created successfully!");
   };
 
