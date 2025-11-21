@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TaskCard from "@/components/TaskCard";
 import TaskModal from "@/components/TaskModal";
-import { Task, Priority } from "@/types/task";
+import { Task, Priority, WorkType } from "@/types/task";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -55,6 +55,7 @@ const Tasks = () => {
       completedAt: task.completed_at ? new Date(task.completed_at) : undefined,
       category: task.category || undefined,
       tags: task.tags || undefined,
+      workType: (task.work_type as WorkType) || undefined,
     }));
 
     setTasks(formattedTasks);
@@ -89,9 +90,21 @@ const Tasks = () => {
     description: string;
     priority: Priority;
     dueDate: string;
+    dueTime: string;
     category: string;
+    workType: WorkType;
   }) => {
     if (!user) return;
+
+    // Combine date and time if both provided
+    let dueDateTimeString = null;
+    if (taskData.dueDate) {
+      if (taskData.dueTime) {
+        dueDateTimeString = `${taskData.dueDate}T${taskData.dueTime}:00`;
+      } else {
+        dueDateTimeString = `${taskData.dueDate}T00:00:00`;
+      }
+    }
 
     const { error } = await supabase
       .from("tasks")
@@ -101,8 +114,9 @@ const Tasks = () => {
         description: taskData.description,
         priority: taskData.priority,
         status: "pending",
-        due_date: taskData.dueDate || null,
+        due_date: dueDateTimeString,
         category: taskData.category || null,
+        work_type: taskData.workType,
       });
 
     if (error) {
