@@ -99,9 +99,12 @@ const Tasks = () => {
     let dueDateTimeString = null;
     if (taskData.dueDate) {
       if (taskData.dueTime) {
-        dueDateTimeString = `${taskData.dueDate}T${taskData.dueTime}:00`;
+        // Create a local datetime string that will be properly stored
+        const localDate = new Date(`${taskData.dueDate}T${taskData.dueTime}`);
+        dueDateTimeString = localDate.toISOString();
       } else {
-        dueDateTimeString = `${taskData.dueDate}T00:00:00`;
+        const localDate = new Date(`${taskData.dueDate}T00:00:00`);
+        dueDateTimeString = localDate.toISOString();
       }
     }
 
