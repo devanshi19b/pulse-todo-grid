@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Calendar, Tag, Flag, Clock, Briefcase, User } from "lucide-react";
+import { X, Calendar, Flag, Clock, Briefcase, User } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,6 @@ interface TaskModalProps {
     priority: Priority;
     dueDate: string;
     dueTime: string;
-    category: string;
     workType: WorkType;
   }) => void;
 }
@@ -28,12 +27,11 @@ const TaskModal = ({ open, onClose, onSave }: TaskModalProps) => {
   const [priority, setPriority] = useState<Priority>("medium");
   const [dueDate, setDueDate] = useState("");
   const [dueTime, setDueTime] = useState("");
-  const [category, setCategory] = useState("");
   const [workType, setWorkType] = useState<WorkType>("personal");
 
   const handleSave = () => {
     if (!title.trim()) return;
-    onSave({ title, description, priority, dueDate, dueTime, category, workType });
+    onSave({ title, description, priority, dueDate, dueTime, workType });
     handleClose();
   };
 
@@ -43,7 +41,6 @@ const TaskModal = ({ open, onClose, onSave }: TaskModalProps) => {
     setPriority("medium");
     setDueDate("");
     setDueTime("");
-    setCategory("");
     setWorkType("personal");
     onClose();
   };
@@ -101,37 +98,22 @@ const TaskModal = ({ open, onClose, onSave }: TaskModalProps) => {
             </Tabs>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                <Flag className="w-4 h-4" />
-                Priority
-              </label>
-              <Select value={priority} onValueChange={(value) => setPriority(value as Priority)}>
-                <SelectTrigger className="glass-card border-primary/30">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="glass-card border-primary/30">
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="critical">Critical</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                <Tag className="w-4 h-4" />
-                Category
-              </label>
-              <Input
-                placeholder="e.g., Work, Personal"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="glass-card border-primary/30"
-              />
-            </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground flex items-center gap-2">
+              <Flag className="w-4 h-4" />
+              Priority
+            </label>
+            <Select value={priority} onValueChange={(value) => setPriority(value as Priority)}>
+              <SelectTrigger className="glass-card border-primary/30">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="glass-card border-primary/30">
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="critical">Critical</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

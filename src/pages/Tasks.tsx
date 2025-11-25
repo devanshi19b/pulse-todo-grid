@@ -91,7 +91,6 @@ const Tasks = () => {
     priority: Priority;
     dueDate: string;
     dueTime: string;
-    category: string;
     workType: WorkType;
   }) => {
     if (!user) return;
@@ -115,7 +114,6 @@ const Tasks = () => {
         priority: taskData.priority,
         status: "pending",
         due_date: dueDateTimeString,
-        category: taskData.category || null,
         work_type: taskData.workType,
       });
 
