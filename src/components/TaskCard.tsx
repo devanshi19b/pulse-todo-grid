@@ -1,6 +1,7 @@
 import { CheckCircle2, Circle, Clock, Flame, AlertTriangle, Zap, Briefcase, User } from "lucide-react";
 import { Task, Priority } from "@/types/task";
 import { cn } from "@/lib/utils";
+import { formatInTimeZone } from "date-fns-tz";
 
 interface TaskCardProps {
   task: Task;
@@ -94,13 +95,11 @@ const TaskCard = ({ task, onToggle, onClick }: TaskCardProps) => {
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Clock className="w-4 h-4" />
               <span>
-                {new Date(task.dueDate).toLocaleString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                {formatInTimeZone(
+                  new Date(task.dueDate),
+                  "Asia/Kolkata",
+                  "MMM d, yyyy HH:mm"
+                )} IST
               </span>
               {isOverdue && (
                 <span className="flex items-center gap-1 text-neon-pink">

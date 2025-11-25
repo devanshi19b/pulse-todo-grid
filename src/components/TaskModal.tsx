@@ -133,13 +133,14 @@ const TaskModal = ({ open, onClose, onSave }: TaskModalProps) => {
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground flex items-center gap-2">
                 <Clock className="w-4 h-4" />
-                Due Time
+                Due Time (IST - 24hr)
               </label>
               <Input
                 type="time"
                 value={dueTime}
                 onChange={(e) => setDueTime(e.target.value)}
-                className="glass-card border-primary/30"
+                className="glass-card border-primary/30 text-base [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert"
+                step="60"
               />
             </div>
           </div>
