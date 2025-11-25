@@ -133,7 +133,7 @@ const TaskModal = ({ open, onClose, onSave }: TaskModalProps) => {
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground flex items-center gap-2">
                 <Clock className="w-4 h-4" />
-                Due Time (IST - 24hr)
+                Due Time (24hr)
               </label>
               <Input
                 type="time"

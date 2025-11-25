@@ -9,7 +9,6 @@ import { Task, Priority, WorkType } from "@/types/task";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { fromZonedTime } from "date-fns-tz";
 
 const Tasks = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -96,18 +95,14 @@ const Tasks = () => {
   }) => {
     if (!user) return;
 
-    // Combine date and time if both provided, treating input as IST
+    // Combine date and time if both provided
     let dueDateTimeString = null;
     if (taskData.dueDate) {
       if (taskData.dueTime) {
-        // Treat the input as IST (Asia/Kolkata) and convert to UTC for storage
-        const istDateTime = `${taskData.dueDate}T${taskData.dueTime}:00`;
-        const utcDate = fromZonedTime(istDateTime, "Asia/Kolkata");
-        dueDateTimeString = utcDate.toISOString();
+        // Store as local datetime string
+        dueDateTimeString = `${taskData.dueDate}T${taskData.dueTime}:00`;
       } else {
-        const istDateTime = `${taskData.dueDate}T00:00:00`;
-        const utcDate = fromZonedTime(istDateTime, "Asia/Kolkata");
-        dueDateTimeString = utcDate.toISOString();
+        dueDateTimeString = `${taskData.dueDate}T00:00:00`;
       }
     }
 
