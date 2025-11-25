@@ -94,9 +94,10 @@ const TaskCard = ({ task, onToggle, onClick }: TaskCardProps) => {
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Clock className="w-4 h-4" />
               <span>
-                {new Date(task.dueDate).toLocaleDateString("en-US", {
+                {new Date(task.dueDate).toLocaleString("en-US", {
                   month: "short",
                   day: "numeric",
+                  year: "numeric",
                   hour: "2-digit",
                   minute: "2-digit",
                 })}
