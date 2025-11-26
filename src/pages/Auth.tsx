@@ -14,6 +14,7 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showSignUpPassword, setShowSignUpPassword] = useState(false);
+  const [activeTab, setActiveTab] = useState("signin");
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
 
@@ -50,12 +51,16 @@ const Auth = () => {
             <Zap className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-4xl font-bold mb-2">Welcome Back</h1>
-          <p className="text-muted-foreground">Sign in to continue managing your tasks</p>
+          <p className="text-muted-foreground">
+            {activeTab === "signin" 
+              ? "Sign in to continue managing your tasks" 
+              : "Sign up to continue managing your tasks"}
+          </p>
         </div>
 
         {/* Auth Form */}
         <div className="glass-card rounded-3xl p-8 neon-glow-blue">
-          <Tabs defaultValue="signin" className="w-full">
+          <Tabs defaultValue="signin" className="w-full" onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2 mb-8">
               <TabsTrigger value="signin" className="data-[state=active]:neon-glow-blue">
                 Sign In
