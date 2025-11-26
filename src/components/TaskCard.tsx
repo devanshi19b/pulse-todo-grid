@@ -1,4 +1,4 @@
-import { CheckCircle2, Circle, Clock, Flame, AlertTriangle, Zap, Briefcase, User } from "lucide-react";
+import { CheckCircle2, Circle, Clock, Flame, AlertTriangle, Zap, Briefcase, User, Edit2 } from "lucide-react";
 import { Task, Priority } from "@/types/task";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -7,6 +7,7 @@ interface TaskCardProps {
   task: Task;
   onToggle: (id: string) => void;
   onClick: (task: Task) => void;
+  onEdit?: (task: Task) => void;
 }
 
 const priorityConfig = {
@@ -36,7 +37,7 @@ const priorityConfig = {
   },
 };
 
-const TaskCard = ({ task, onToggle, onClick }: TaskCardProps) => {
+const TaskCard = ({ task, onToggle, onClick, onEdit }: TaskCardProps) => {
   const config = priorityConfig[task.priority];
   const PriorityIcon = config.icon;
   const isCompleted = task.status === "completed";
@@ -77,11 +78,24 @@ const TaskCard = ({ task, onToggle, onClick }: TaskCardProps) => {
             >
               {task.title}
             </h3>
-            <div className={cn("flex items-center gap-1.5 px-3 py-1 rounded-full", config.glow)}>
-              <PriorityIcon className={cn("w-4 h-4", config.color)} />
-              <span className={cn("text-xs font-medium uppercase", config.color)}>
-                {task.priority}
-              </span>
+            <div className="flex items-center gap-2">
+              {onEdit && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(task);
+                  }}
+                  className="p-2 rounded-lg hover:bg-primary/20 transition-colors neon-glow-blue"
+                >
+                  <Edit2 className="w-4 h-4 text-primary" />
+                </button>
+              )}
+              <div className={cn("flex items-center gap-1.5 px-3 py-1 rounded-full", config.glow)}>
+                <PriorityIcon className={cn("w-4 h-4", config.color)} />
+                <span className={cn("text-xs font-medium uppercase", config.color)}>
+                  {task.priority}
+                </span>
+              </div>
             </div>
           </div>
 
