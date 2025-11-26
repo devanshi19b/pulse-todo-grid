@@ -50,7 +50,9 @@ const Auth = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/20 neon-glow-blue mb-4">
             <Zap className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="text-4xl font-bold mb-2">Welcome Back</h1>
+          <h1 className="text-4xl font-bold mb-2">
+            {activeTab === "signin" ? "Welcome Back" : "Welcome"}
+          </h1>
           <p className="text-muted-foreground">
             {activeTab === "signin" 
               ? "Sign in to continue managing your tasks" 
