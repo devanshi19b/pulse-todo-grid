@@ -19,15 +19,38 @@ interface TaskModalProps {
     dueTime: string;
     workType: WorkType;
   }) => void;
+  editTask?: {
+    id: string;
+    title: string;
+    description?: string;
+    priority: Priority;
+    dueDate?: Date;
+    workType?: WorkType;
+  } | null;
 }
 
-const TaskModal = ({ open, onClose, onSave }: TaskModalProps) => {
+const TaskModal = ({ open, onClose, onSave, editTask }: TaskModalProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<Priority>("medium");
   const [dueDate, setDueDate] = useState("");
   const [dueTime, setDueTime] = useState("");
   const [workType, setWorkType] = useState<WorkType>("personal");
+
+  useEffect(() => {
+    if (editTask) {
+      setTitle(editTask.title);
+      setDescription(editTask.description || "");
+      setPriority(editTask.priority);
+      setWorkType(editTask.workType || "personal");
+      
+      if (editTask.dueDate) {
+        const date = new Date(editTask.dueDate);
+        setDueDate(date.toISOString().split('T')[0]);
+        setDueTime(date.toTimeString().slice(0, 5));
+      }
+    }
+  }, [editTask]);
 
   const handleSave = () => {
     if (!title.trim()) return;
@@ -53,7 +76,7 @@ const TaskModal = ({ open, onClose, onSave }: TaskModalProps) => {
             <div className="p-2 rounded-lg bg-primary/20 neon-glow-blue">
               <Flag className="w-5 h-5 text-primary" />
             </div>
-            New Task
+            {editTask ? "Edit Task" : "New Task"}
           </DialogTitle>
         </DialogHeader>
 
@@ -159,7 +182,7 @@ const TaskModal = ({ open, onClose, onSave }: TaskModalProps) => {
             disabled={!title.trim()}
             className="flex-1 neon-glow-blue bg-primary hover:bg-primary/90"
           >
-            Create Task
+            {editTask ? "Save Changes" : "Create Task"}
           </Button>
         </div>
       </DialogContent>

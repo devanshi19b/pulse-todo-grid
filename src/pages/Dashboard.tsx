@@ -22,6 +22,7 @@ const motivationalMessages = [
 const Dashboard = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [greeting, setGreeting] = useState("");
   const [userName, setUserName] = useState("");
   const [motivationalMessage, setMotivationalMessage] = useState("");
@@ -142,6 +143,40 @@ const Dashboard = () => {
   }) => {
     if (!user) return;
 
+    // If editing, update existing task
+    if (editingTask) {
+      // Combine date and time if both provided
+      let dueDateTimeString = null;
+      if (taskData.dueDate) {
+        if (taskData.dueTime) {
+          dueDateTimeString = `${taskData.dueDate}T${taskData.dueTime}:00`;
+        } else {
+          dueDateTimeString = `${taskData.dueDate}T00:00:00`;
+        }
+      }
+
+      const { error } = await supabase
+        .from("tasks")
+        .update({
+          title: taskData.title,
+          description: taskData.description,
+          priority: taskData.priority,
+          due_date: dueDateTimeString,
+          work_type: taskData.workType,
+        })
+        .eq("id", editingTask.id);
+
+      if (error) {
+        toast.error("Failed to update task");
+        return;
+      }
+
+      loadTasks();
+      setEditingTask(null);
+      toast.success("Task updated successfully!");
+      return;
+    }
+
     // Combine date and time if both provided
     let dueDateTimeString = null;
     if (taskData.dueDate) {
@@ -186,6 +221,11 @@ const Dashboard = () => {
 
     setTasks((prev) => [newTask, ...prev]);
     toast.success("Task created successfully!");
+  };
+
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setIsModalOpen(true);
   };
 
   const recentTasks = tasks.slice(0, 4);
@@ -248,6 +288,7 @@ const Dashboard = () => {
                 task={task}
                 onToggle={handleToggleTask}
                 onClick={() => {}}
+                onEdit={handleEditTask}
               />
             ))}
           </div>
@@ -263,8 +304,12 @@ const Dashboard = () => {
 
         <TaskModal
           open={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            setIsModalOpen(false);
+            setEditingTask(null);
+          }}
           onSave={handleCreateTask}
+          editTask={editingTask}
         />
       </div>
     </div>
