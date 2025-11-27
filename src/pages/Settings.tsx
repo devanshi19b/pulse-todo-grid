@@ -1,4 +1,4 @@
-import { Bell, Palette, User, Shield, Edit2, Mail, Phone, Upload } from "lucide-react";
+import { Bell, Palette, User, Shield, Edit2, Mail, Phone, Upload, ChevronDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ const Settings = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isProfileExpanded, setIsProfileExpanded] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -153,94 +154,106 @@ const Settings = () => {
 
         {/* Edit Profile */}
         <div className="glass-card rounded-2xl p-6 space-y-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-neon-green/20 neon-glow-green">
-              <Edit2 className="w-5 h-5 text-neon-green" />
+          <div 
+            className="flex items-center justify-between cursor-pointer"
+            onClick={() => setIsProfileExpanded(!isProfileExpanded)}
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-neon-green/20 neon-glow-green">
+                <Edit2 className="w-5 h-5 text-neon-green" />
+              </div>
+              <h2 className="text-xl font-bold">Edit Profile</h2>
             </div>
-            <h2 className="text-xl font-bold">Edit Profile</h2>
+            <ChevronDown 
+              className={`w-6 h-6 text-muted-foreground transition-transform duration-300 ${
+                isProfileExpanded ? 'rotate-180' : ''
+              }`}
+            />
           </div>
 
-          <div className="space-y-6">
-            {/* Avatar */}
-            <div className="flex items-center gap-4">
-              <Avatar className="w-20 h-20">
-                <AvatarImage src={avatarUrl} alt={username} />
-                <AvatarFallback className="text-lg">
-                  {username?.charAt(0)?.toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 space-y-2">
-                <Label htmlFor="avatar-url" className="text-sm font-medium">
-                  Profile Picture URL
+          {isProfileExpanded && (
+            <div className="space-y-6 animate-in fade-in-50 slide-in-from-top-2 duration-300">
+              {/* Avatar */}
+              <div className="flex items-center gap-4">
+                <Avatar className="w-20 h-20">
+                  <AvatarImage src={avatarUrl} alt={username} />
+                  <AvatarFallback className="text-lg">
+                    {username?.charAt(0)?.toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 space-y-2">
+                  <Label htmlFor="avatar-url" className="text-sm font-medium">
+                    Profile Picture URL
+                  </Label>
+                  <Input
+                    id="avatar-url"
+                    type="url"
+                    placeholder="https://example.com/avatar.jpg"
+                    value={avatarUrl}
+                    onChange={(e) => setAvatarUrl(e.target.value)}
+                    className="glass-card border-border/50"
+                  />
+                </div>
+              </div>
+
+              {/* Username */}
+              <div className="space-y-2">
+                <Label htmlFor="username" className="text-sm font-medium flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  Username
                 </Label>
                 <Input
-                  id="avatar-url"
-                  type="url"
-                  placeholder="https://example.com/avatar.jpg"
-                  value={avatarUrl}
-                  onChange={(e) => setAvatarUrl(e.target.value)}
+                  id="username"
+                  type="text"
+                  placeholder="Enter your username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="glass-card border-border/50"
                 />
               </div>
-            </div>
 
-            {/* Username */}
-            <div className="space-y-2">
-              <Label htmlFor="username" className="text-sm font-medium flex items-center gap-2">
-                <User className="w-4 h-4" />
-                Username
-              </Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="Enter your username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="glass-card border-border/50"
-              />
-            </div>
+              {/* Email */}
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="glass-card border-border/50"
+                />
+              </div>
 
-            {/* Email */}
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="glass-card border-border/50"
-              />
-            </div>
+              {/* Phone */}
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-sm font-medium flex items-center gap-2">
+                  <Phone className="w-4 h-4" />
+                  Phone Number
+                </Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="glass-card border-border/50"
+                />
+              </div>
 
-            {/* Phone */}
-            <div className="space-y-2">
-              <Label htmlFor="phone" className="text-sm font-medium flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                Phone Number
-              </Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="Enter your phone number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="glass-card border-border/50"
-              />
+              {/* Save Button */}
+              <Button
+                onClick={handleSaveProfile}
+                disabled={loading}
+                className="w-full neon-glow-green"
+              >
+                {loading ? "Saving..." : "Save Changes"}
+              </Button>
             </div>
-
-            {/* Save Button */}
-            <Button
-              onClick={handleSaveProfile}
-              disabled={loading}
-              className="w-full neon-glow-green"
-            >
-              {loading ? "Saving..." : "Save Changes"}
-            </Button>
-          </div>
+          )}
         </div>
 
         {/* Profile Preferences */}
