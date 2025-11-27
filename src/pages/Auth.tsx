@@ -56,7 +56,7 @@ const Auth = () => {
           <p className="text-muted-foreground">
             {activeTab === "signin" 
               ? "Sign in to continue managing your tasks" 
-              : "Sign up to continue managing your tasks"}
+              : "Sign up to start managing your tasks"}
           </p>
         </div>
 
