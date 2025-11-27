@@ -90,68 +90,6 @@ const Settings = () => {
           <p className="text-muted-foreground">Customize your task manager experience</p>
         </div>
 
-        {/* Notifications */}
-        <div className="glass-card rounded-2xl p-6 space-y-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-primary/20 neon-glow-blue">
-              <Bell className="w-5 h-5 text-primary" />
-            </div>
-            <h2 className="text-xl font-bold">Notifications</h2>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="daily-summary" className="text-base">
-                Daily Summary
-              </Label>
-              <Switch id="daily-summary" defaultChecked />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="task-reminders" className="text-base">
-                Task Reminders
-              </Label>
-              <Switch id="task-reminders" defaultChecked />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="deadline-alerts" className="text-base">
-                Deadline Alerts
-              </Label>
-              <Switch id="deadline-alerts" defaultChecked />
-            </div>
-          </div>
-        </div>
-
-        {/* Appearance */}
-        <div className="glass-card-purple rounded-2xl p-6 space-y-6 border-neon-purple/20">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-neon-purple/20 neon-glow-purple">
-              <Palette className="w-5 h-5 text-neon-purple" />
-            </div>
-            <h2 className="text-xl font-bold">Appearance</h2>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="animations" className="text-base">
-                Smooth Animations
-              </Label>
-              <Switch id="animations" defaultChecked />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="glow-effects" className="text-base">
-                Neon Glow Effects
-              </Label>
-              <Switch id="glow-effects" defaultChecked />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="high-contrast" className="text-base">
-                High Contrast Mode
-              </Label>
-              <Switch id="high-contrast" />
-            </div>
-          </div>
-        </div>
-
         {/* Edit Profile */}
         <div className="glass-card rounded-2xl p-6 space-y-6">
           <div 
@@ -254,6 +192,68 @@ const Settings = () => {
               </Button>
             </div>
           )}
+        </div>
+
+        {/* Notifications */}
+        <div className="glass-card rounded-2xl p-6 space-y-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-lg bg-primary/20 neon-glow-blue">
+              <Bell className="w-5 h-5 text-primary" />
+            </div>
+            <h2 className="text-xl font-bold">Notifications</h2>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="daily-summary" className="text-base">
+                Daily Summary
+              </Label>
+              <Switch id="daily-summary" defaultChecked />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="task-reminders" className="text-base">
+                Task Reminders
+              </Label>
+              <Switch id="task-reminders" defaultChecked />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="deadline-alerts" className="text-base">
+                Deadline Alerts
+              </Label>
+              <Switch id="deadline-alerts" defaultChecked />
+            </div>
+          </div>
+        </div>
+
+        {/* Appearance */}
+        <div className="glass-card-purple rounded-2xl p-6 space-y-6 border-neon-purple/20">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-lg bg-neon-purple/20 neon-glow-purple">
+              <Palette className="w-5 h-5 text-neon-purple" />
+            </div>
+            <h2 className="text-xl font-bold">Appearance</h2>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="animations" className="text-base">
+                Smooth Animations
+              </Label>
+              <Switch id="animations" defaultChecked />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="glow-effects" className="text-base">
+                Neon Glow Effects
+              </Label>
+              <Switch id="glow-effects" defaultChecked />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="high-contrast" className="text-base">
+                High Contrast Mode
+              </Label>
+              <Switch id="high-contrast" />
+            </div>
+          </div>
         </div>
 
         {/* Profile Preferences */}
