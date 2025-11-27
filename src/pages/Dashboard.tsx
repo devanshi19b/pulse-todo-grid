@@ -145,15 +145,18 @@ const Dashboard = () => {
 
     // If editing, update existing task
     if (editingTask) {
-      // Combine date and time if both provided
-      let dueDateTimeString = null;
-      if (taskData.dueDate) {
-        if (taskData.dueTime) {
-          dueDateTimeString = `${taskData.dueDate}T${taskData.dueTime}:00`;
-        } else {
-          dueDateTimeString = `${taskData.dueDate}T00:00:00`;
-        }
+    // Combine date and time if both provided
+    let dueDateTimeString = null;
+    if (taskData.dueDate) {
+      if (taskData.dueTime) {
+        // Create date in local timezone
+        const localDate = new Date(`${taskData.dueDate}T${taskData.dueTime}`);
+        dueDateTimeString = localDate.toISOString();
+      } else {
+        const localDate = new Date(`${taskData.dueDate}T00:00`);
+        dueDateTimeString = localDate.toISOString();
       }
+    }
 
       const { error } = await supabase
         .from("tasks")
@@ -181,9 +184,12 @@ const Dashboard = () => {
     let dueDateTimeString = null;
     if (taskData.dueDate) {
       if (taskData.dueTime) {
-        dueDateTimeString = `${taskData.dueDate}T${taskData.dueTime}:00`;
+        // Create date in local timezone
+        const localDate = new Date(`${taskData.dueDate}T${taskData.dueTime}`);
+        dueDateTimeString = localDate.toISOString();
       } else {
-        dueDateTimeString = `${taskData.dueDate}T00:00:00`;
+        const localDate = new Date(`${taskData.dueDate}T00:00`);
+        dueDateTimeString = localDate.toISOString();
       }
     }
 
