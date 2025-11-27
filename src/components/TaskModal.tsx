@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Calendar, Flag, Clock, Briefcase, User } from "lucide-react";
+import { X, Calendar as CalendarIcon, Flag, Clock, Briefcase, User } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Priority, WorkType } from "@/types/task";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface TaskModalProps {
   open: boolean;
@@ -33,7 +37,7 @@ const TaskModal = ({ open, onClose, onSave, editTask }: TaskModalProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<Priority>("medium");
-  const [dueDate, setDueDate] = useState("");
+  const [date, setDate] = useState<Date>();
   const [dueTime, setDueTime] = useState("");
   const [workType, setWorkType] = useState<WorkType>("personal");
 
@@ -45,15 +49,18 @@ const TaskModal = ({ open, onClose, onSave, editTask }: TaskModalProps) => {
       setWorkType(editTask.workType || "personal");
       
       if (editTask.dueDate) {
-        const date = new Date(editTask.dueDate);
-        setDueDate(date.toISOString().split('T')[0]);
-        setDueTime(date.toTimeString().slice(0, 5));
+        const taskDate = new Date(editTask.dueDate);
+        setDate(taskDate);
+        const hours = taskDate.getHours().toString().padStart(2, '0');
+        const minutes = taskDate.getMinutes().toString().padStart(2, '0');
+        setDueTime(`${hours}:${minutes}`);
       }
     }
   }, [editTask]);
 
   const handleSave = () => {
     if (!title.trim()) return;
+    const dueDate = date ? format(date, "yyyy-MM-dd") : "";
     onSave({ title, description, priority, dueDate, dueTime, workType });
     handleClose();
   };
@@ -62,7 +69,7 @@ const TaskModal = ({ open, onClose, onSave, editTask }: TaskModalProps) => {
     setTitle("");
     setDescription("");
     setPriority("medium");
-    setDueDate("");
+    setDate(undefined);
     setDueTime("");
     setWorkType("personal");
     onClose();
@@ -142,15 +149,32 @@ const TaskModal = ({ open, onClose, onSave, editTask }: TaskModalProps) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
+                <CalendarIcon className="w-4 h-4" />
                 Due Date
               </label>
-              <Input
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className="glass-card border-primary/30"
-              />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal glass-card border-primary/30",
+                      !date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="space-y-2">
