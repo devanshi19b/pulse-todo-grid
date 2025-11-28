@@ -8,6 +8,7 @@ import { Task, Priority, WorkType } from "@/types/task";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { Chatbot } from "@/components/Chatbot";
 
 const motivationalMessages = [
   "Every task completed is a step closer to your goals! 💪",
@@ -317,6 +318,7 @@ const Dashboard = () => {
           onSave={handleCreateTask}
           editTask={editingTask}
         />
+        <Chatbot />
       </div>
     </div>
   );
