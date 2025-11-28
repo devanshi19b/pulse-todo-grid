@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,6 +19,30 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
+    // Get user's tasks
+    const authHeader = req.headers.get('Authorization');
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader ?? '' } } }
+    );
+
+    const { data: tasks, error: tasksError } = await supabaseClient
+      .from('tasks')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (tasksError) {
+      console.error('Error fetching tasks:', tasksError);
+    }
+
+    // Format tasks for context
+    const tasksContext = tasks && tasks.length > 0
+      ? `\n\nUser's Current Tasks:\n${tasks.map(task => 
+          `- ${task.title} (Priority: ${task.priority}, Status: ${task.status}${task.due_date ? `, Due: ${new Date(task.due_date).toLocaleDateString()}` : ''}${task.description ? `, Description: ${task.description}` : ''})`
+        ).join('\n')}`
+      : '\n\nUser has no tasks yet.';
+
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -29,7 +54,7 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'You are a helpful task management assistant. Help users manage their tasks, provide productivity tips, and answer questions about their work. Keep responses clear, concise, and actionable.'
+            content: `You are a helpful task management assistant. Help users manage their tasks, provide productivity tips, and answer questions about their work. Keep responses clear, concise, and actionable.${tasksContext}\n\nYou can answer questions about their tasks, provide summaries, suggest priorities, and offer productivity advice based on their current workload.`
           },
           ...messages
         ],
